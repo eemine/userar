@@ -1,9 +1,10 @@
 import express from 'express';
-import categoryController from '../controllers/categoryController';
+import { indexAction, getCategoryById, addNewCategory } from '../controllers/categoryController';
 
 const router = express.Router();
 
-router.get('/', categoryController.getAll);
-router.get('/:id', categoryController.getById);
+router.get('/', indexAction);
+router.post('/', addNewCategory);
+router.get('/:categoryId', getCategoryById);
 
 export default router;

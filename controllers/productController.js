@@ -1,56 +1,61 @@
-import mysql from 'mysql';
 import AppError from '../errors/AppError';
+import makeQuery from '../service/MysqlConnection';
 
-const logger = require('../utils/logger')('productController');
-
-const config = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+export const indexAction = async (req, res, next) => {
+  try {
+    const sql = 'select * from product';
+    const data = await makeQuery(sql);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
 };
 
-const getAll = async (req, res, next) => {
-  logger.log('info', `product/getAll: ${JSON.stringify(req.params)}`);
+export const getProductById = async (req, res, next) => {
+  const { productId } = req.params;
   try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query('SELECT * FROM product', null, (error, results) => {
-      if (error) {
-        console.error(error);
-      }
-      if (results) {
-        res.json(results);
-      }
+    const sql = 'select * from product where id = ?';
+    const data = await makeQuery(sql, productId);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
+};
+
+export const addNewProduct = async (req, res, next) => {
+  const { body } = req;
+  const {
+    title,
+    image,
+    description,
+    price,
+    amount,
+    categoryId,
+    rate,
+    vote,
+    discount,
+    manufactureId,
+  } = body;
+
+  const sql = `insert into product set ?`;
+  try {
+    const data = await makeQuery(sql, {
+      title,
+      image,
+      description,
+      price,
+      amount,
+      categoryId,
+      rate,
+      vote,
+      discount,
+      manufactureId,
+      createdAt: new Date(),
     });
-  } catch (err) {
-    next(new AppError(err.message, 400));
-  }
-};
 
-const getById = async (req, res, next) => {
-  logger.log('info', `product/getById: ${JSON.stringify(req.params)}`);
-  try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query(
-      `SELECT * FROM product WHERE id = ${req.params.id}`,
-      null,
-      (error, results) => {
-        if (error) {
-          console.error(error);
-        }
-        if (results) {
-          res.json(results);
-        }
-      },
-    );
-  } catch (err) {
-    next(new AppError(err.message, 400));
+    res.status(201).send(data);
+  } catch (error) {
+    console.log(error);
+    next(new AppError(error.mesage));
   }
-};
-
-export default {
-  getAll,
-  getById,
 };

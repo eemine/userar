@@ -28,19 +28,23 @@ const getAll = async (req, res, next) => {
   }
 };
 
-const getById = async (req, res, next) => {
-  logger.log('info', `user/getById: ${JSON.stringify(req.params)}`);
+const getUserById = async (req, res, next) => {
+  logger.log('info', `user/getUserById: ${JSON.stringify(req.params)}`);
   try {
     const connection = mysql.createConnection(config);
     connection.connect();
-    connection.query(`SELECT * FROM user WHERE id = ${req.params.id}`, null, (error, results) => {
-      if (error) {
-        console.error(error);
-      }
-      if (results) {
-        res.json(results);
-      }
-    });
+    connection.query(
+      `SELECT * FROM user WHERE id = ${req.params.userId}`,
+      null,
+      (error, results) => {
+        if (error) {
+          console.error(error);
+        }
+        if (results) {
+          res.json(results);
+        }
+      },
+    );
   } catch (err) {
     next(new AppError(err.message, 400));
   }
@@ -48,5 +52,5 @@ const getById = async (req, res, next) => {
 
 export default {
   getAll,
-  getById,
+  getUserById,
 };

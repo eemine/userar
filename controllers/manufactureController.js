@@ -1,56 +1,46 @@
-import mysql from 'mysql';
 import AppError from '../errors/AppError';
+import makeQuery from '../service/MysqlConnection';
 
-const logger = require('../utils/logger')('manufactureController');
-
-const config = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+export const indexAction = async (req, res, next) => {
+  try {
+    const sql = 'SELECT * FROM manufacture';
+    const data = await makeQuery(sql);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
 };
 
-const getAll = async (req, res, next) => {
-  logger.log('info', `manufacture/getAll: ${JSON.stringify(req.params)}`);
+export const getManufactureById = async (req, res, next) => {
+  const { manufactureId } = req.params;
   try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query('SELECT * FROM manufacture', null, (error, results) => {
-      if (error) {
-        console.error(error);
-      }
-      if (results) {
-        res.json(results);
-      }
+    const sql = 'select * from manufacture where id = ?';
+    const data = await makeQuery(sql, manufactureId);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
+};
+
+export const addNewManufacture = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const {
+      title,
+      description,
+      picture,
+    } = body;
+
+    const sql = `insert into manufacture set ?`;
+    const data = await makeQuery(sql, {
+      title,
+      description,
+      picture,
     });
-  } catch (err) {
-    next(new AppError(err.message, 400));
+
+    res.status(201).send(data);
+  } catch (error) {
+    next(new AppError(error.mesage));
   }
 };
 
-const getById = async (req, res, next) => {
-  logger.log('info', `manufacture/getById: ${JSON.stringify(req.params)}`);
-  try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query(
-      `SELECT * FROM manufacture WHERE id = ${req.params.id}`,
-      null,
-      (error, results) => {
-        if (error) {
-          console.error(error);
-        }
-        if (results) {
-          res.json(results);
-        }
-      },
-    );
-  } catch (err) {
-    next(new AppError(err.message, 400));
-  }
-};
-
-export default {
-  getAll,
-  getById,
-};

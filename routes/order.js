@@ -4,6 +4,6 @@ import orderController from '../controllers/orderController';
 const router = express.Router();
 
 router.get('/', orderController.getAll);
-router.get('/:id', orderController.getById);
+router.get('/:orderId', orderController.getOrderById);
 
 export default router;

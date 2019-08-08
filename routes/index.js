@@ -5,6 +5,7 @@ import manufacture from './manufacture';
 import product from './product';
 import category from './category';
 import order from './order';
+import comment from './comment';
 
 export default {
   healthCheck,
@@ -14,4 +15,5 @@ export default {
   product,
   category,
   order,
+  comment,
 };

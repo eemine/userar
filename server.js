@@ -11,13 +11,14 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', routes.healthCheck);
-app.use('/api/home', routes.home);
-app.use('/api/user', routes.user);
-app.use('/api/manufacture', routes.manufacture);
-app.use('/api/product', routes.product);
-app.use('/api/category', routes.category);
-app.use('/api/order', routes.order);
-app.use(`/api/v${process.env.API_VERSION}`, routes.healthCheck);
+app.use('/home', routes.home);
+app.use('/users', routes.user);
+app.use('/manufacturers', routes.manufacture);
+app.use('/products', routes.product);
+app.use('/categories', routes.category);
+app.use('/orders', routes.order);
+app.use('/comments', routes.comment);
+app.use(`/v${process.env.API_VERSION}`, routes.healthCheck);
 
 app.use(defaultErrorHandler);
 

@@ -28,13 +28,13 @@ const getAll = async (req, res, next) => {
   }
 };
 
-const getById = async (req, res, next) => {
-  logger.log('info', `order/getById: ${JSON.stringify(req.params)}`);
+const getOrderById = async (req, res, next) => {
+  logger.log('info', `getOrderById: ${JSON.stringify(req.params)}`);
   try {
     const connection = mysql.createConnection(config);
     connection.connect();
     connection.query(
-      `SELECT * FROM \`order\` WHERE id = ${req.params.id}`,
+      `SELECT * FROM \`order\` WHERE id = ${req.params.orderId}`,
       null,
       (error, results) => {
         if (error) {
@@ -52,5 +52,5 @@ const getById = async (req, res, next) => {
 
 export default {
   getAll,
-  getById,
+  getOrderById,
 };

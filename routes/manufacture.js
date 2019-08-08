@@ -1,9 +1,10 @@
 import express from 'express';
-import manufactureController from '../controllers/manufactureController';
+import { indexAction, addNewManufacture, getManufactureById } from '../controllers/manufactureController';
 
 const router = express.Router();
 
-router.get('/', manufactureController.getAll);
-router.get('/:id', manufactureController.getById);
+router.get('/', indexAction);
+router.post('/', addNewManufacture);
+router.get('/:manufactureId', getManufactureById);
 
 export default router;

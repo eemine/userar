@@ -3,7 +3,7 @@ import makeQuery from '../service/MysqlConnection';
 
 export const indexAction = async (req, res, next) => {
   try {
-    const sql = 'SELECT * FROM category';
+    const sql = 'SELECT * FROM comment';
     const data = await makeQuery(sql);
     res.json(data);
   } catch (err) {
@@ -11,31 +11,34 @@ export const indexAction = async (req, res, next) => {
   }
 };
 
-export const getCategoryById = async (req, res, next) => {
-  const { categoryId } = req.params;
+export const getCommentById = async (req, res, next) => {
+  const { commentId } = req.params;
   try {
-    const sql = 'select * from category where id = ?';
-    const data = await makeQuery(sql, categoryId);
+    const sql = 'select * from comment where id = ?';
+    const data = await makeQuery(sql, commentId);
     res.json(data);
   } catch (err) {
     next(new AppError(err.message, 400));
   }
 };
 
-export const addNewCategory = async (req, res, next) => {
+export const addNewComment = async (req, res, next) => {
   try {
     const { body } = req;
     const {
       title,
-      description,
-      categoryId,
+      text,
+      productId,
+      userId,
     } = body;
 
-    const sql = `insert into category set ?`;
+    const sql = `insert into comment set ?`;
     const data = await makeQuery(sql, {
       title,
-      description,
-      categoryId,
+      text,
+      createdAt: new Date(),
+      productId,
+      userId,
     });
 
     res.status(201).send(data);
