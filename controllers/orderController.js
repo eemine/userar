@@ -51,7 +51,6 @@ export const addNewOrder = async (req, res, next) => {
 
     res.status(201).send(orderData);
   } catch (error) {
-    console.log(error);
     next(new AppError(error.mesage));
   }
 };
