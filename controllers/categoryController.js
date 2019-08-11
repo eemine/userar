@@ -25,11 +25,7 @@ export const getCategoryById = async (req, res, next) => {
 export const addNewCategory = async (req, res, next) => {
   try {
     const { body } = req;
-    const {
-      title,
-      description,
-      categoryId,
-    } = body;
+    const { title, description, categoryId } = body;
 
     const sql = `insert into category set ?`;
     const data = await makeQuery(sql, {

@@ -1,7 +1,5 @@
 import AppError from '../errors/AppError';
 
-const logger = require('../utils/logger')('UserController');
-
 const healthCheck = async (req, res, next) => {
   logger.log('info', `healthCheck: ${JSON.stringify(req.params)}`);
   try {

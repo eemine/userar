@@ -1,9 +1,11 @@
 import express from 'express';
-import userController from '../controllers/userController';
+import { indexAction, addNewUser, getUserById } from '../controllers/userController';
 
 const router = express.Router();
 
-router.get('/', userController.getAll);
-router.get('/:userId', userController.getUserById);
+router.get('/', indexAction);
+router.post('/', addNewUser)
+router.get('/:userId', getUserById);
 
 export default router;
+

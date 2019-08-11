@@ -1,56 +1,41 @@
-import mysql from 'mysql';
 import AppError from '../errors/AppError';
+import makeQuery from '../service/MysqlConnection';
 
-const logger = require('../utils/logger')('orderController');
-
-const config = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+export const indexAction = async (req, res, next) => {
+  try {
+    const sql = 'SELECT * FROM `order`';
+    const data = await makeQuery(sql);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
 };
 
-const getAll = async (req, res, next) => {
-  logger.log('info', `order/getAll: ${JSON.stringify(req.params)}`);
+export const getOrderById = async (req, res, next) => {
+  const { orderId } = req.params;
   try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query('SELECT * FROM `order`', null, (error, results) => {
-      if (error) {
-        console.error(error);
-      }
-      if (results) {
-        res.json(results);
-      }
+    const sql = 'select * from `order` where id = ?';
+    const data = await makeQuery(sql, orderId);
+    res.json(data);
+  } catch (err) {
+    next(new AppError(err.message, 400));
+  }
+};
+
+export const addNewOrder = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const { sum, userId, createdAt } = body;
+
+    const sql = `insert into \`order\` set ?`;
+    const data = await makeQuery(sql, {
+      sum,
+      userId,
+      createdAt,
     });
-  } catch (err) {
-    next(new AppError(err.message, 400));
-  }
-};
 
-const getOrderById = async (req, res, next) => {
-  logger.log('info', `getOrderById: ${JSON.stringify(req.params)}`);
-  try {
-    const connection = mysql.createConnection(config);
-    connection.connect();
-    connection.query(
-      `SELECT * FROM \`order\` WHERE id = ${req.params.orderId}`,
-      null,
-      (error, results) => {
-        if (error) {
-          console.error(error);
-        }
-        if (results) {
-          res.json(results);
-        }
-      },
-    );
-  } catch (err) {
-    next(new AppError(err.message, 400));
+    res.status(201).send(data);
+  } catch (error) {
+    next(new AppError(error.mesage));
   }
-};
-
-export default {
-  getAll,
-  getOrderById,
 };

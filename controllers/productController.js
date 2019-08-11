@@ -1,10 +1,16 @@
 import AppError from '../errors/AppError';
 import makeQuery from '../service/MysqlConnection';
 
+const getProductFromDB = productId => {
+  const sql = 'select * from product where id = ?';
+  return makeQuery(sql, productId);
+};
+
 export const indexAction = async (req, res, next) => {
   try {
     const sql = 'select * from product';
     const data = await makeQuery(sql);
+
     res.json(data);
   } catch (err) {
     next(new AppError(err.message, 400));
@@ -13,49 +19,64 @@ export const indexAction = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
   const { productId } = req.params;
+
   try {
-    const sql = 'select * from product where id = ?';
-    const data = await makeQuery(sql, productId);
+    const data = await getProductFromDB(productId);
+
+    if (data.length === 0) {
+      res.status(404).send('Product not found');
+      return;
+    }
+
     res.json(data);
   } catch (err) {
     next(new AppError(err.message, 400));
   }
 };
 
-export const addNewProduct = async (req, res, next) => {
+export const modifyProduct = async (req, res, next) => {
+  const { productId } = req.params;
+
+  if (productId) {
+    const data = await getProductFromDB(productId);
+
+    if (data.length === 0) {
+      res.status(404).send('Product not found');
+      return;
+    }
+  }
+
   const { body } = req;
-  const {
-    title,
-    image,
-    description,
-    price,
-    amount,
-    categoryId,
-    rate,
-    vote,
-    discount,
-    manufactureId,
-  } = body;
 
-  const sql = `insert into product set ?`;
+  const sql = `${!productId ? 'insert into' : 'update'} product set ? ${
+    !productId ? '' : ' where id = ?'
+  }`;
+
   try {
-    const data = await makeQuery(sql, {
-      title,
-      image,
-      description,
-      price,
-      amount,
-      categoryId,
-      rate,
-      vote,
-      discount,
-      manufactureId,
-      createdAt: new Date(),
-    });
-
+    const data = await makeQuery(sql, [{ ...body, createdAt: new Date() }, productId]);
     res.status(201).send(data);
   } catch (error) {
-    console.log(error);
-    next(new AppError(error.mesage));
+    next(new AppError(error.message, 400));
+  }
+};
+
+export const deleteProduct = async (req, res, next) => {
+  const { productId } = req.params;
+
+  if (productId) {
+    const data = await getProductFromDB(productId);
+
+    if (data.length === 0) {
+      res.status(404).send('Product not found');
+      return;
+    }
+  }
+
+  const sql = `delete from product where id = ?`;
+  try {
+    const data = await makeQuery(sql, productId);
+    res.status(202).send(data);
+  } catch (error) {
+    next(new AppError(error.message, 400));
   }
 };

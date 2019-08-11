@@ -6,6 +6,7 @@ import product from './product';
 import category from './category';
 import order from './order';
 import comment from './comment';
+import file from './file';
 
 export default {
   healthCheck,
@@ -16,4 +17,5 @@ export default {
   category,
   order,
   comment,
+  file,
 };
