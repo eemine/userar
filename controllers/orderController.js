@@ -27,11 +27,14 @@ export const addNewOrder = async (req, res, next) => {
     const { body } = req;
     const { productIds, userId } = body;
 
+    // 1. Need to get all product details in order to calculate order sum
     const selectProducts = 'select * from product where id in (?)';
     const products = await makeQuery(selectProducts, [productIds]);
 
+    // 2. Calculate order sum
     const orderSum = products.reduce((sum, product) => sum += product.price, 0);
 
+    // 3. Insert into table order and get order ID after insert
     const insertOrder = `insert into \`order\` set ?`;
     const orderData = await makeQuery(insertOrder, {
       sum: orderSum,
@@ -39,6 +42,8 @@ export const addNewOrder = async (req, res, next) => {
       createdAt: new Date(),
     });
 
+    // 4. Insert into product_in_order table productId and orderId in order to save which
+    // products was in order
     const insertOrderProducts = 'insert into product_in_order(productid, orderid) values ?';
     const values = productIds.map(id => [id, orderData.insertId]);
 
