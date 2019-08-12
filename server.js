@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
+import cors from 'cors';
 import './utils/dotenv';
 import routes from './routes';
 import defaultErrorHandler from './middlewares/defaultErrorHandler';
@@ -9,12 +10,12 @@ const logger = require('./utils/logger')(process.env.APP_NAME);
 
 const app = express();
 
+app.use(cors());
 app.use(
   fileUpload({
     createParentPath: true,
   }),
 );
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/public`));
